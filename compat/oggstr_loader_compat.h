@@ -17,6 +17,11 @@ protected:
 	static void _bind_methods();
 
 public:
-	Vector<uint8_t> get_ogg_stream_data(const String &p_path, Error *r_err) const;
+	Vector<uint8_t> get_ogg_stream_data(const String &p_path, Error *r_err);
+	bool loop = false;
+	double loop_offset = 0.0;
+	double bpm = 0.0;
+	int beat_count = 0;
+	int bar_beats = 0;
 };
 #endif //OGGSTR_LOADER_COMPAT_H

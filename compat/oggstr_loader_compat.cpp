@@ -86,7 +86,7 @@ Error packet_sequence_to_raw_data(const Ref<OggPacketSequence> &packet_sequence,
 	return OK;
 }
 
-Vector<uint8_t> OggStreamLoaderCompat::get_ogg_stream_data(const String &p_path, Error *r_err) const {
+Vector<uint8_t> OggStreamLoaderCompat::get_ogg_stream_data(const String &p_path, Error *r_err) {
 	Error err;
 	Ref<FileAccess> f = FileAccess::open(p_path, FileAccess::READ, &err);
 	if (r_err) {
@@ -112,6 +112,11 @@ Vector<uint8_t> OggStreamLoaderCompat::get_ogg_stream_data(const String &p_path,
 		}
 		ERR_FAIL_COND_V_MSG(err != OK, Vector<uint8_t>(), "Cannot open resource '" + p_path + "'.");
 		auto packet_sequence = sample->get_packet_sequence();
+		loop = sample->has_loop();
+		loop_offset = sample->get_loop_offset();
+		bpm = sample->get_bpm();
+		beat_count = sample->get_beat_count();
+		bar_beats = sample->get_bar_beats();
 		Error err = packet_sequence_to_raw_data(packet_sequence, data);
 		ERR_FAIL_COND_V_MSG(err != OK, Vector<uint8_t>(), "Cannot convert packet sequence to raw data.");
 		return data;

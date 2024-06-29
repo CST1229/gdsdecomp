@@ -133,8 +133,8 @@ public:
 	Error convert_res_bin_2_txt(const String &output_dir, const String &p_path, const String &p_dst);
 	Error convert_tex_to_png(const String &output_dir, const String &p_path, const String &p_dst);
 	Error convert_sample_to_wav(const String &output_dir, const String &p_path, const String &p_dst);
-	Error convert_oggstr_to_ogg(const String &output_dir, const String &p_path, const String &p_dst);
-	Error convert_mp3str_to_mp3(const String &output_dir, const String &p_path, const String &p_dst);
+	Error convert_oggstr_to_ogg(const String &output_dir, const String &p_path, const String &p_dst, const Ref<ImportInfo> &iinfo);
+	Error convert_mp3str_to_mp3(const String &output_dir, const String &p_path, const String &p_dst, const Ref<ImportInfo> &iinfo);
 	Error decompile_scripts(const String &output_dir);
 
 	Error _export_imports(const String &output_dir, const Vector<String> &files_to_export, EditorProgressGDDC *pr, String &error_string);

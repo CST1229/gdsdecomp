@@ -174,9 +174,9 @@ Error ImportExporter::_export_imports(const String &p_out_dir, const Vector<Stri
 		} else if (opt_export_samples && (importer == "sample" || importer == "wav")) {
 			err = export_sample(output_dir, iinfo);
 		} else if (opt_export_ogg && (importer == "ogg_vorbis" || importer == "oggvorbisstr")) {
-			err = convert_oggstr_to_ogg(output_dir, iinfo->get_path(), iinfo->get_export_dest());
+			err = convert_oggstr_to_ogg(output_dir, iinfo->get_path(), iinfo->get_export_dest(), iinfo);
 		} else if (opt_export_mp3 && importer == "mp3") {
-			err = convert_mp3str_to_mp3(output_dir, iinfo->get_path(), iinfo->get_export_dest());
+			err = convert_mp3str_to_mp3(output_dir, iinfo->get_path(), iinfo->get_export_dest(), iinfo);
 		} else if (importer == "bitmap") {
 			err = export_texture(output_dir, iinfo);
 		} else if ((opt_bin2text && iinfo->is_auto_converted())
@@ -1195,13 +1195,19 @@ Error ImportExporter::convert_sample_to_wav(const String &output_dir, const Stri
 	return OK;
 }
 
-Error ImportExporter::convert_oggstr_to_ogg(const String &output_dir, const String &p_path, const String &p_dst) {
+Error ImportExporter::convert_oggstr_to_ogg(const String &output_dir, const String &p_path, const String &p_dst, const Ref<ImportInfo> &iinfo) {
 	String src_path = _get_path(output_dir, p_path);
 	String dst_path = output_dir.path_join(p_dst.replace("res://", ""));
 	Error err;
 	OggStreamLoaderCompat oslc;
 	PackedByteArray data = oslc.get_ogg_stream_data(src_path, &err);
 	ERR_FAIL_COND_V_MSG(err != OK, err, "Could not load oggstr file " + p_path);
+
+	iinfo->set_param("loop", oslc.loop);
+	iinfo->set_param("loop_offset", oslc.loop_offset);
+	iinfo->set_param("bpm", oslc.bpm);
+	iinfo->set_param("beat_count", oslc.beat_count);
+	iinfo->set_param("bar_beats", oslc.bar_beats);
 
 	err = ensure_dir(dst_path.get_base_dir());
 	ERR_FAIL_COND_V_MSG(err != OK, err, "Failed to create dirs for " + dst_path);
@@ -1215,13 +1221,19 @@ Error ImportExporter::convert_oggstr_to_ogg(const String &output_dir, const Stri
 	return OK;
 }
 
-Error ImportExporter::convert_mp3str_to_mp3(const String &output_dir, const String &p_path, const String &p_dst) {
+Error ImportExporter::convert_mp3str_to_mp3(const String &output_dir, const String &p_path, const String &p_dst, const Ref<ImportInfo> &iinfo) {
 	String src_path = _get_path(output_dir, p_path);
 	String dst_path = output_dir.path_join(p_dst.replace("res://", ""));
 	Error err;
 
 	Ref<AudioStreamMP3> sample = ResourceLoader::load(src_path, "", ResourceFormatLoader::CACHE_MODE_IGNORE, &err);
 	ERR_FAIL_COND_V_MSG(err != OK, err, "Could not load mp3str file " + p_path);
+
+	iinfo->set_param("loop", sample->has_loop());
+	iinfo->set_param("loop_offset", sample->get_loop_offset());
+	iinfo->set_param("bpm", sample->get_bpm());
+	iinfo->set_param("beat_count", sample->get_beat_count());
+	iinfo->set_param("bar_beats", sample->get_bar_beats());
 
 	err = ensure_dir(dst_path.get_base_dir());
 	ERR_FAIL_COND_V_MSG(err != OK, err, "Failed to create dirs for " + dst_path);
