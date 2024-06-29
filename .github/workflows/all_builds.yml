@@ -1,5 +1,6 @@
 name: Build Editor and Standalone
 on:
+  workflow_dispatch:
   push:
     paths:
       - "**"
